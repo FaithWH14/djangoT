@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h3>Job Application List</h3>
+
+    {% for obj in objects %}
+        <p>name         : {{obj.name}}</p>
+        <p>age          : {{obj.age}}</p>
+        <p>qualification: {{obj.qualification}}</p>
+        <p>position     : {{obj.position}}</p>
+        <br>
+    {% endfor %}
+{% endblock %}
