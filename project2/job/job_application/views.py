@@ -1,3 +1,4 @@
+from tokenize import Token
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views import View
 from .models import jobApplication
@@ -10,6 +11,8 @@ from rest_framework.views import APIView
 from rest_framework import generics
 from rest_framework import mixins
 from rest_framework import viewsets
+from rest_framework.authentication import SessionAuthentication, TokenAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 from .serializers import jobAppliedSerializer
 
@@ -113,23 +116,29 @@ class jobApplicationDelete(AppliedObjectMixin, View):
         return render(request, self.template_name, context)
     
 
-class jobAppliedViewSet(viewsets.ModelViewSet, mixins.DestroyModelMixin):
+class jobAppliedViewSet(viewsets.ModelViewSet):
+    serializer_class = jobAppliedSerializer
+    queryset = jobApplication.objects.all() 
+
+class jobAppliedGenericSet(generics.GenericAPIView, mixins.ListModelMixin, mixins.CreateModelMixin,
+                            mixins.UpdateModelMixin, mixins.RetrieveModelMixin, mixins.DestroyModelMixin):
+    lookup_field = "id"
     serializer_class = jobAppliedSerializer
     queryset = jobApplication.objects.all()
-    # lookup_field = "id"
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
 
-    # def get(self, request, id = None, *args, **kwargs):
-    #     if id:
-    #         return self.retrieve(request)
-    #     else:
-    #         self.list(request)
-    
-    # def post(self, request, *args, **kwargs):
-    #     return self.create(request)
-    
-    # def put(self, request, id = None, *args, **kwargs):
-    #     return self.update(request, id)
+    def get(self, request, id = None):
+        if id:
+            return self.retrieve(request)
+        else:
+            return self.list(request)
 
-    # def delete(self, request, id = None, *args, **kwargs):
-    #     return self.destroy(request, id)
-        
+    def post(self, request):
+        return self.create(request)
+
+    def put(self, request, id = None):
+        return self.update(request, id)
+
+    def destroy(self, request, id):
+        return self.destroy(request, id)

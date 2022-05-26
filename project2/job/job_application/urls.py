@@ -1,11 +1,13 @@
 from django.urls import path, include
-from .views import jobApplicationList, jobApplicationCreate, jobApplicationView, jobApplicationUpdate, jobApplicationDelete, jobAppliedViewSet
+from .views import (
+    jobApplicationList, jobApplicationCreate, jobApplicationView, 
+    jobApplicationUpdate, jobApplicationDelete, jobAppliedViewSet,
+    jobAppliedGenericSet
+)
 from rest_framework.routers import DefaultRouter
-
 
 router = DefaultRouter()
 router.register("jobApplied", jobAppliedViewSet, basename = "jobApplied")
-
 
 urlpatterns = [
     path("", jobApplicationList.as_view(), name = "Job Application List"),
@@ -13,5 +15,8 @@ urlpatterns = [
     path("detail/<int:id>/", jobApplicationView.as_view(), name = "Job Application View"),
     path("detail/<int:id>/update/", jobApplicationUpdate.as_view(), name = "Job Application Update"),
     path("detail/<int:id>/delete/", jobApplicationDelete.as_view(), name = "Job Application Delete"),
-    path("viewset/", include(router.urls))
+    path("viewset/", include(router.urls)),
+    path("viewset/<int:pk>/", include(router.urls)),
+    path("generic/", jobAppliedGenericSet.as_view()),
+    path("generic/<int:id>/", jobAppliedGenericSet.as_view())
 ]
